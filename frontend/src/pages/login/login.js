@@ -8,7 +8,7 @@ export default () => (
 		<Navbar title="Login - GyKi" />
 		<div className="module">
 			<Container className="module-inside">
-				<Row id="" className="justify-content-md-center">
+				<Row className="justify-content-md-center">
 					<Col className="col-md-8 col-lg-6">
 						{/* <p class="pen">Login - Gyki - Video</p> */}
 						<List inlineLabels noHairlinesMd>
@@ -33,6 +33,11 @@ export default () => (
 								<Button large raised fill className="submit">Submit</Button>
 							</Row>
 						</List>
+					</Col>
+				</Row>
+				<Row className="footer justify-content-md-center">
+					<Col lg="auto">
+						<Link className="github" href="https://github.com/Flam3rboy/gykivideo" target="_blank" external>Github</Link>
 					</Col>
 				</Row>
 			</Container>

@@ -10,7 +10,7 @@ const { String } = mongoose.Schema.Types;
 mongoose.connect(config.database, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const User = mongoose.model("User", { username: String, password: String, nickname: String, class: String }, "users");
-const Teacher = mongoose.model("Teacher", { username: String, nickname: String, password: String }, "teacher");
+const Teacher = mongoose.model("Teacher", { username: String, password: String, nickname: String }, "teacher");
 const Team = mongoose.model("Team", { name: String, classes: [String] }, "teams");
 const Class = mongoose.model(
 	"Class",

@@ -4,12 +4,12 @@
 
 
 
-`Class deprecated`
-User
-Teacher
-Team - consists of: Classes & Users & Teachers
+`Class deprecated`<br>
+User <br>
+Teacher <br>
+Team - consists of: Classes & Users & Teachers <br>
 
-Voice&Video MAINFOKUS
-Chat
-drawing field/Tafel
-Screenshare
+Voice&Video MAINFOKUS <br>
+Chat <br>
+drawing field/Tafel <br>
+Screenshare <br>

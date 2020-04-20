@@ -11,7 +11,7 @@ mongoose.connect(config.database, { useNewUrlParser: true, useUnifiedTopology: t
 
 const User = mongoose.model("User", { username: String, password: String, nickname: String, class: String }, "users");
 const Teacher = mongoose.model("Teacher", { username: String, nickname: String, password: String }, "teacher");
-const Team = mongoose.model("Team", { name: String, classes: [String] }, "teams");
+const Team = mongoose.model("Team", { name: String, classes: [String], users: [String] }, "teams");
 const Class = mongoose.model(
 	"Class",
 	{

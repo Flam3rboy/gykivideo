@@ -11,6 +11,10 @@ module.exports = (app) => {
 	const Team = mongoose.model("Team");
 	const Class = mongoose.model("Class");
 
+	app.get("/user", async (req, res) => {
+		res.json({ ...req.user });
+	});
+
 	app.post("/user/login", async (req, res) => {
 		var { username, password } = req.body;
 
@@ -28,7 +32,7 @@ module.exports = (app) => {
 				var correctPassword = await bcrypt.compare(password, user.password);
 				if (!correctPassword) throw new Error("Ungültiges Password");
 
-				const accessToken = jwt.sign({ username: username, id: user.id }, config.jwtsecret);
+				const accessToken = jwt.sign({ username: username, id: user.id, class: user.class }, config.jwtsecret);
 
 				var toReturn = {
 					success: true,
@@ -36,6 +40,7 @@ module.exports = (app) => {
 					user: {
 						class: user.class,
 						username,
+						id: user.id,
 					},
 				};
 

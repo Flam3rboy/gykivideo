@@ -1,9 +1,8 @@
 # gykivideo
 
 ## Ideas:
-`
-    //Class deprecated
-`
+_Class deprecated_
+```
     User
     Teacher
     Team - consists of: Classes & Users & Teachers
@@ -12,3 +11,4 @@
     Chat
     drawing field/Tafel
     Screenshare
+```

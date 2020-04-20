@@ -1,3 +1,16 @@
 div[data-name="login"] {
 	// background: black;
+	// .LoginRadioStudent {
+	// }
+	// .LoginRadioTeacher {
+	// }
+	.pen {
+		font-family: Arial, Helvetica, sans-serif;
+		text-align: center;
+		font-size: var(--f7-inline-label-font-size);
+		// width: 35%;
+	}
+	.submit {
+		margin-top: 15px !important;
+	}
 }

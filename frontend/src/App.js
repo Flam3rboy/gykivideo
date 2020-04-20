@@ -17,6 +17,7 @@ const f7params = {
 			component: HomePage,
 		},
 	],
+	theme: "ios",
 	name: "GYKI Video",
 	id: "com.gyki.video",
 };

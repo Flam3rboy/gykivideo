@@ -1,13 +1,21 @@
+import "react-app-polyfill/ie11";
+import "react-app-polyfill/stable";
 import React from "react";
 import ReactDOM from "react-dom";
-// import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/css/bootstrap-grid.min.css";
 import "framework7/css/framework7.min.css";
 import Framework7 from "framework7/framework7.esm.bundle";
 import Framework7React from "framework7-react";
 import "./index.scss";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
+import io from "socket.io-client";
+import ws from "./ws";
 
+const socket = io("http://localhost:2000");
+
+global.socket = socket;
+ws(socket);
 Framework7.use(Framework7React);
 
 ReactDOM.render(

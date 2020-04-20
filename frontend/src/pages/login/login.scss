@@ -26,4 +26,14 @@ div[data-name="login"] {
 		/* This will make it stack on top of the ::before */
 		position: relative;
 	}
+
+	.footer {
+		.col {
+			width: auto !important;
+		}
+		.github {
+			color: white;
+			text-align: center;
+		}
+	}
 }

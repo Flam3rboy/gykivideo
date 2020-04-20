@@ -10,16 +10,16 @@ const f7params = {
 	routes: [
 		{
 			path: "/login",
-			component: LoginPage,
+			component: LoginPage
 		},
 		{
 			path: "/",
-			component: HomePage,
+			component: HomePage
 		},
 	],
 	theme: "ios",
 	name: "GYKI Video",
-	id: "com.gyki.video",
+	id: "com.gyki.video"
 };
 
 class WebApp extends React.Component {

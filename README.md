@@ -2,7 +2,7 @@
 
 ## Ideas:
 
-    Class
+    `//Class deprecated`
     User
     Teacher
     Team - consists of: Classes & Users & Teachers

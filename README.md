@@ -1,8 +1,9 @@
 # gykivideo
 
 ## Ideas:
-
-    `//Class deprecated`
+`
+    //Class deprecated
+`
     User
     Teacher
     Team - consists of: Classes & Users & Teachers

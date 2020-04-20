@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 const login = require("./login");
 const { String } = mongoose.Schema.Types;
 
-mongoose.connect("mongodb://server:27017/gykivideo", { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(config.database, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const User = mongoose.model("User", { username: String, password: String, nickname: String, class: String }, "users");
 const Teacher = mongoose.model("Teacher", { username: String, nickname: String, password: String }, "teacher");

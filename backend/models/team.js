@@ -1,7 +1,11 @@
-const Team = mongoose.model(
+const mongoose = require("mongoose");
+const { String, ObjectId, Boolean, Date } = mongoose.Schema.Types;
+module.exports = mongoose.model(
 	"Team",
 	{
 		name: String,
+		users: [ObjectId],
+		teams: [ObjectId],
 		timetable: [
 			{
 				day: String,
@@ -14,7 +18,6 @@ const Team = mongoose.model(
 				],
 			},
 		],
-		users: [ObjectId],
 	},
 	"teams"
 );

@@ -1,0 +1,30 @@
+diff --git a/node_modules/express-jwt-permissions/index.js b/node_modules/express-jwt-permissions/index.js
+index aa9d918..5ae1803 100644
+--- a/node_modules/express-jwt-permissions/index.js
++++ b/node_modules/express-jwt-permissions/index.js
+@@ -2,9 +2,6 @@ var util = require('util')
+ var get = require('lodash.get')
+ 
+ var UnauthorizedError = require('./error')
+-var PermissionError = new UnauthorizedError(
+-  'permission_denied', { message: 'Permission denied' }
+-)
+ 
+ var Guard = function (options) {
+   var defaults = {
+@@ -70,9 +67,13 @@ Guard.prototype = {
+         return required.every(function (permission) {
+           return permissions.indexOf(permission) !== -1
+         })
+-      })
++	  })
+ 	  
+-      next(!sufficient ? PermissionError : null)
++	  if (!sufficient) {
++		return res.status(403).json({ success: false, error: "Forbidden" });
++	  }
++
++      return next(null)
+     }.bind(this)
+ 
+     _middleware.unless = require('express-unless')

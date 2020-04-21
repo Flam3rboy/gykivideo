@@ -4,69 +4,111 @@ var jwt = require("jsonwebtoken");
 const fetch = require("node-fetch");
 var FormData = require("form-data");
 const config = require("./config.json");
+const User = mongoose.model("User");
+const Team = mongoose.model("Team");
+const { ObjectId } = mongoose.Types;
 
 module.exports = (app) => {
-	const Student = mongoose.model("Student");
-	const Teacher = mongoose.model("Teacher");
-	const Team = mongoose.model("Team");
+	app.get("/user", async (req, res, next) => {
+		try {
+			var user = await User.findById(req.user.id).exec();
+			if (!user) throw new Error("Nutzer nicht gefunden");
+			var { id, username, role } = user;
 
-	app.get("/user", async (req, res) => {
-		res.json({ ...req.user });
+			res.json({ success: true, id, username, role });
+		} catch (error) {
+			next(error);
+		}
 	});
 
-	app.post("/user/login", async (req, res) => {
+	app.get("/user/teams", async (req, res, next) => {
 		try {
+			var id = req.user.id;
+
+			var teams = await Team.find({ users: id });
+			var teams = teams.map((team) => {
+				var { id, users, name } = team;
+				return { id, users, name };
+			});
+
+			res.status(200).json({ success: true, teams });
+		} catch (error) {
+			next(error);
+		}
+	});
+
+	app.post("/user/login", async (req, res, next) => {
+		try {
+			if (!req.body) throw new Error("POST must contain body");
 			var { username, password, role } = req.body;
-			if (!role) throw new Error("Bitte gib eine Nutzerrrolle an");
-			if (!["student", "teacher"].includes(role)) throw new Error("Unbekannter Nutzerrolle");
+			if (!role) role = "student";
+			if (!["student", "teacher", "admin"].includes(role)) throw new Error("Unbekannte Nutzerrolle");
 
 			var user = await User.findOne({ username }).exec();
-			var userClass;
-			if (!user) {
-				var login = await login(role, { username, password });
-				if (!login.success) throw login.error;
+			var teams;
+			if (!user || !user.password) {
+				var loginRes = await login(role, { username, password });
+				if (!loginRes.success) throw loginRes.error;
 				var hash = await bcrypt.hash(password, config.saltRounds);
 
-				switch (role) {
-					case "student":
-						userClass = await Team.findOne({ name: userClass }).exec();
+				if (role === "student") {
+					// add student to his class
+					var className = loginRes.user.class;
+					var userTeam = await Team.findOne({ name: className }).exec();
 
-						if (!userClass) {
-							var timetable = convertTimetable(plan);
-							userClass = await new Team({ name: klasse, timetable, users: [] }).save();
-						}
-						user = await new Student({ username, password: hash, class: userClass.id }).save();
-						Team.updateOne({ name: klasse }, { $push: { users: user.id } }).exec();
-						break;
-					case "teacher":
-						teacher = await new Teacher({ username, password: hash }).save();
-						return loginTeacher(args);
+					if (!userTeam) {
+						// create team if it doesn't exist
+						var timetable = convertTimetable(loginRes.plan);
+						userTeam = await new Team({ name: className, timetable, users: [], teams: [] }).save();
+					}
+				} else if (role === "teacher") {
+					var className = "Lehrerzimmer";
+					var userTeam = await Team.findOne({ name: className }).exec();
+
+					if (!userTeam) {
+						// create team if it doesn't exist
+						userTeam = await new Team({ name: className, users: [], teams: [] }).save();
+					}
+				}
+
+				user = await new User({ username, password: hash, role }).save();
+
+				if (["student", "teacher"].includes(role)) {
+					await addUserToTeam({ team: userTeam.id, user: user.id });
 				}
 			} else {
-				userClass = await Team.findById(user.class).exec();
+				teams = await Team.findById(user.class).exec();
+				role = user.role;
 			}
 
 			var correctPassword = await bcrypt.compare(password, user.password);
-			if (!correctPassword) throw new Error("Ungültiges Password");
+			if (!correctPassword)
+				throw new Error("Ungültiges Password oder ein Nutzer mit dem Nutzernamen existiert bereits");
 
-			const accessToken = jwt.sign({ username: username, id: user.id, class: user.class }, config.jwtsecret);
+			const accessToken = jwt.sign({ id: user.id, permissions: [role] }, config.jwtsecret, {
+				expiresIn: config.jwtexpire,
+			});
 
 			var toReturn = {
 				success: true,
 				accessToken,
 				user: {
-					class: user.class,
 					username,
 					id: user.id,
+					role,
 				},
 			};
 
 			res.status(200).json(toReturn);
 		} catch (error) {
-			res.status(400).json({ success: false, error: error.toString() });
+			next(error);
 		}
 	});
 };
+
+function addUserToTeam({ user, team }) {
+	return Team.findByIdAndUpdate(team, { $push: { users: user } }).exec();
+}
 
 function login(role, args) {
 	switch (role) {
@@ -74,6 +116,9 @@ function login(role, args) {
 			return loginStudent(args);
 		case "teacher":
 			return loginTeacher(args);
+		case "admin":
+			if (password !== "q3IOUUlfA!3sTVjkaNfTSO") return { success: false, error: error.toString() };
+			return { success: true };
 		default:
 			throw new Error("Unbekannter Nutzerrolle");
 	}
@@ -135,7 +180,7 @@ async function loginStudent({ username, password }) {
 				throw new Error("Benutzername oder Passwort falsch");
 		}
 	} catch (error) {
-		return { success: false, error: error.toString() };
+		return { success: false, error: error };
 	}
 }
 
@@ -188,7 +233,7 @@ async function loginTeacher({ username, password }) {
 		}
 
 		if (api.redirected) {
-			return { success: true, teacher: { username, password } };
+			return { success: true };
 		} else {
 			var searchError = "<p class='font' style='font-size: 10pt; color: #CC0033'>";
 			var error = text.indexOf(searchError);

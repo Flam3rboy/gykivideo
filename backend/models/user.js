@@ -1,5 +1,8 @@
-var user = { role: String, username: String, password: String, nickname: String };
-const User = mongoose.model("User", user, "users");
-
-const Student = mongoose.model("Student", { ...user, class: ObjectId }, "users");
-const Teacher = mongoose.model("Teacher", { ...user }, "users");
+const mongoose = require("mongoose");
+const { String, ObjectId, Boolean, Date } = mongoose.Schema.Types;
+module.exports = User = mongoose.model(
+	"User",
+	{ role: String, username: String, password: String, nickname: String },
+	"users"
+);
+// Teams werden in Teams.users abgespeichert

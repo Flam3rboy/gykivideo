@@ -2,9 +2,6 @@
 
 ## Ideas:
 
-
-
--`Class deprecated`<br>
 -User <br>
 -Teacher <br>
 -Team - consists of: Classes & Users & Teachers <br>

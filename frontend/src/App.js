@@ -49,7 +49,7 @@ class WebApp extends React.Component {
 	render() {
 		return (
 			<App params={f7params}>
-				<View reloadPages main loadInitialPage pushState pushStateSeparator="" />
+				<View preloadPreviousPage reloadPages main loadInitialPage pushState pushStateSeparator="" />
 			</App>
 		);
 	}

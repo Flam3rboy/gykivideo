@@ -12,6 +12,12 @@ class LoginPage extends React.Component {
 		this.state = {};
 	}
 
+	componentDidUpdate() {
+		if (this.props.user.loggedin) {
+			this.$f7router.navigate("/", { animate: false, pushState: true });
+		}
+	}
+
 	saveInput = (e) => {
 		e = e.target;
 		var set = {};
@@ -34,10 +40,6 @@ class LoginPage extends React.Component {
 	};
 
 	render() {
-		if (this.props.user.loggedin) {
-			this.$f7router.navigate("/", { animate: false, pushState: true });
-		}
-
 		return (
 			<Page name="login">
 				<Navbar title="Videokonferenz - Login" />

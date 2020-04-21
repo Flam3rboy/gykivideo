@@ -7,12 +7,14 @@ class HomePage extends React.Component {
 		this.state = {};
 	}
 
-	render() {
+	componentDidUpdate() {
 		console.log(this.props.user.loggedin);
 		if (!this.props.user.loggedin) {
 			this.$f7router.navigate("/login/", { animate: false, pushState: true });
 		}
+	}
 
+	render() {
 		return (
 			<Page name="home">
 				<Navbar title="Home Page" />

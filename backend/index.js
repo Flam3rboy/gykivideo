@@ -34,7 +34,6 @@ user(app);
 team(app);
 
 app.use(function (err, req, res, next) {
-	console.log(err);
 	if (err.code === "permission_denied") {
 		res.status(403).json({ success: false, error: "Forbidden" });
 	} else if (err.name === "UnauthorizedError") {

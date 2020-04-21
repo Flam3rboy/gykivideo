@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "axios"
 
 export function user(state = { id: "", loggedin: true, username: "", role: "" }, action) {
 	switch (action.type) {

@@ -5,6 +5,7 @@ import axios from "axios";
 import config from "./config.json";
 import LoginPage from "./pages/login/login";
 import HomePage from "./pages/home/home";
+import Sidebar from "./components/sidebar/sidebar"
 import { connect } from "react-redux";
 
 const f7params = {
@@ -26,6 +27,7 @@ const f7params = {
 	name: "GYKI Video",
 	id: "com.gyki.video",
 };
+
 
 class WebApp extends React.Component {
 	constructor(props) {
@@ -49,6 +51,7 @@ class WebApp extends React.Component {
 	render() {
 		return (
 			<App params={f7params}>
+				<Sidebar></Sidebar>
 				<View preloadPreviousPage reloadPages main loadInitialPage pushState pushStateSeparator="" />
 			</App>
 		);

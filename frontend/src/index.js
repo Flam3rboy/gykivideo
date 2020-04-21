@@ -2,6 +2,7 @@ import "react-app-polyfill/ie11";
 import "react-app-polyfill/stable";
 import "bootstrap/dist/css/bootstrap-grid.min.css";
 import "framework7/css/framework7.bundle.min.css";
+import 'framework7-icons';
 import "./index.scss";
 import React from "react";
 import ReactDOM from "react-dom";

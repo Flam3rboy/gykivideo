@@ -1,0 +1,10 @@
+.side-item{
+  color: white;
+  transition: color .2s !important;
+  &:hover{
+    color: rgb(170, 170, 170);
+  }
+  *{
+    margin: 1rem;
+  }
+}

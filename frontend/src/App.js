@@ -41,6 +41,7 @@ class WebApp extends React.Component {
 		axios.defaults.baseURL = config.api;
 		var token = localStorage.getItem("token");
 		if (!token) return this.props.logout();
+
 		axios.defaults.headers.common["Authorization"] = token;
 		var user = (await axios.get("/user")).data;
 		if (!user.success) this.props.logout();

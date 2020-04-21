@@ -1,5 +1,5 @@
 
-export function sidebar(state = { open: false }, action) {
+export function sidebar(state = { open: true }, action) {
     switch (action.type) {
         case "SIDEBAR_CLOSE":
             return { open: false };

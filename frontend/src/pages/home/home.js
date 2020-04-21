@@ -1,16 +1,18 @@
 import React from "react";
 import { App, View, Page, Navbar, Toolbar, Link } from "framework7-react";
-
-export default class HomePage extends React.Component {
+import { connect } from "react-redux";
+class HomePage extends React.Component {
 	constructor(props) {
 		super(props);
+		this.state = {};
 	}
 
 	render() {
-		var loggedIn = false;
-		if (!loggedIn) {
+		console.log(this.props.user.loggedin);
+		if (!this.props.user.loggedin) {
 			this.$f7router.navigate("/login/", { animate: false, pushState: true });
 		}
+
 		return (
 			<Page name="home">
 				<Navbar title="Home Page" />
@@ -24,3 +26,13 @@ export default class HomePage extends React.Component {
 		);
 	}
 }
+
+export default connect(
+	(s) => s,
+	(dispatch) => {
+		return {
+			login: (user) => dispatch({ type: "LOGIN", payload: user }),
+			logout: (user) => dispatch({ type: "LOGOUT", payload: user }),
+		};
+	}
+)(HomePage);

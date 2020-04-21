@@ -3,17 +3,13 @@ import { Page, Navbar, Link, List, ListInput, ListItem, Button, Card, CardHeader
 import "./login.scss";
 import { Container, Col, Row } from "react-bootstrap";
 import axios from "axios";
-import config from "../../config.json";
 import gyki from "../../resources/gyki.png";
+import { connect } from "react-redux";
 
-export default class LoginPage extends React.Component {
+class LoginPage extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			role: "student",
-			username: "",
-			password: "",
-		};
+		this.state = {};
 	}
 
 	saveInput = (e) => {
@@ -32,12 +28,16 @@ export default class LoginPage extends React.Component {
 		if (!json.success) return this.setState({ error: json.error });
 		var { accessToken, user } = json;
 		accessToken = "Bearer " + accessToken;
-		axios.defaults.headers.common["Authorization"] = accessToken;
 		localStorage.setItem("token", accessToken);
-		console.log(json);
+		this.props.login(user);
+		this.$f7router.navigate("/", { pushState: true });
 	};
 
 	render() {
+		if (this.props.user.loggedin) {
+			this.$f7router.navigate("/", { animate: false, pushState: true });
+		}
+
 		return (
 			<Page name="login">
 				<Navbar title="Videokonferenz - Login" />
@@ -59,7 +59,7 @@ export default class LoginPage extends React.Component {
 									</CardHeader>
 									<CardContent className="p-3">
 										<form>
-											<List inlineLabels noHairlinesMd>
+											<List noHairlinesMd>
 												<ListInput
 													label="Name"
 													autocomplete="username"
@@ -124,3 +124,13 @@ export default class LoginPage extends React.Component {
 		);
 	}
 }
+
+export default connect(
+	(s) => s,
+	(dispatch) => {
+		return {
+			login: (user) => dispatch({ type: "LOGIN", payload: user }),
+			logout: (user) => dispatch({ type: "LOGOUT", payload: user }),
+		};
+	}
+)(LoginPage);

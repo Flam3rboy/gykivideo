@@ -1,17 +1,23 @@
 import "react-app-polyfill/ie11";
 import "react-app-polyfill/stable";
-import React from "react";
-import ReactDOM from "react-dom";
 import "bootstrap/dist/css/bootstrap-grid.min.css";
 import "framework7/css/framework7.bundle.min.css";
+import "./index.scss";
+import React from "react";
+import ReactDOM from "react-dom";
 import Framework7 from "framework7/framework7.esm.bundle";
 import Framework7React from "framework7-react";
-import "./index.scss";
+import io from "socket.io-client";
+import axios from "axios";
+import { createStore } from "redux";
+import { Provider } from "react-redux";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
-import io from "socket.io-client";
 import ws from "./ws";
+import allReducers from "./reducers/";
 
+const store = createStore(allReducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+axios.defaults.validateStatus = () => true;
 const socket = io("http://localhost:2000");
 
 global.socket = socket;
@@ -19,13 +25,13 @@ ws(socket);
 Framework7.use(Framework7React);
 
 ReactDOM.render(
-	<React.StrictMode>
+	<Provider store={store}>
 		<App />
-	</React.StrictMode>,
+	</Provider>,
 	document.getElementById("root")
 );
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+serviceWorker.register();

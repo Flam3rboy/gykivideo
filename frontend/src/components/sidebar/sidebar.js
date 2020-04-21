@@ -3,35 +3,44 @@ import { App, View, Page, Navbar, Toolbar, Link, Panel, Block, Col, Button } fro
 import { connect } from "react-redux";
 
 class Sidebar extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
+	constructor(props) {
+		super(props);
+		this.state = {};
+	}
 
-    log(t) {
-        console.log(t)
-    }
+	log(t) {
+		console.log("log", t);
+	}
 
-    render() {
+	componentDidMount() {}
 
-        return (
-            <Panel  panelOpened={this.log.bind(null, "open")} panelBackdropClick={this.log.bind(null, "closed")} opened={this.props.sidebar.open} right resizable themeDark>
-                <View>
-                    <Page>
-                        <Block>Right panel content</Block>
-                    </Page>
-                </View>
-            </Panel>
-        );
-    }
+	render() {
+		return (
+			<Panel
+				className="sidebar"
+				onPanelOpened={this.props.open}
+				onPanelClosed={this.props.close}
+				opened={this.props.sidebar.open}
+				left
+				resizable
+				themeDark
+			>
+				<View>
+					<Page>
+						<Block>Right panel content</Block>
+					</Page>
+				</View>
+			</Panel>
+		);
+	}
 }
 
 export default connect(
-    (s) => s,
-    (dispatch) => {
-        return {
-            close: () => dispatch({ type: "SIDEBAR_CLOSE" }),
-            open: () => dispatch({ type: "SIDEBAR_OPEN" }),
-        };
-    }
+	(s) => s,
+	(dispatch) => {
+		return {
+			close: () => dispatch({ type: "SIDEBAR_CLOSE" }),
+			open: () => dispatch({ type: "SIDEBAR_OPEN" }),
+		};
+	}
 )(Sidebar);

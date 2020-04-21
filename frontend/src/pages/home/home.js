@@ -17,11 +17,13 @@ class HomePage extends React.Component {
 	render() {
 		return (
 			<Page name="home">
-				<Navbar title="Home Page"/>
+				<Navbar title="Home Page" />
 				<Block>Left panel content</Block>
 				<Block className="row">
 					<Col>
-						<Button onClick={this.props.sidebarOpen} raised >Open left panel</Button>
+						<Button onClick={this.props.sidebarOpen} raised>
+							Open left panel
+						</Button>
 					</Col>
 				</Block>
 			</Page>

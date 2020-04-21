@@ -9,14 +9,24 @@ import Framework7 from "framework7/framework7.esm.bundle";
 import Framework7React from "framework7-react";
 import io from "socket.io-client";
 import axios from "axios";
-import { createStore } from "redux";
+import { createStore, compose } from "redux";
 import { Provider } from "react-redux";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import ws from "./ws";
 import allReducers from "./reducers/";
 
-const store = createStore(allReducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+const composeEnhancers =
+	typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+		? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+				// Specify extension’s options like name, actionsBlacklist, actionsCreators, serialize...
+				trace: true,
+		  })
+		: compose;
+
+const enhancer = composeEnhancers();
+
+const store = createStore(allReducers, enhancer);
 axios.defaults.validateStatus = () => true;
 const socket = io("http://localhost:2000");
 

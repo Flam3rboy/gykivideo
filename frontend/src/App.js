@@ -5,6 +5,7 @@ import axios from "axios";
 import config from "./config.json";
 import LoginPage from "./pages/login/login";
 import HomePage from "./pages/home/home";
+import ChatPage from "./pages/chat/chat";
 import Sidebar from "./components/sidebar/sidebar";
 import { connect } from "react-redux";
 
@@ -18,6 +19,10 @@ const f7params = {
 		{
 			path: "/",
 			component: HomePage,
+		},
+		{
+			path: "/chat",
+			component: ChatPage,
 		},
 	],
 	touch: {
@@ -57,7 +62,15 @@ class WebApp extends React.Component {
 		return (
 			<App params={f7params}>
 				<Sidebar></Sidebar>
-				<View preloadPreviousPage reloadPages main loadInitialPage pushState pushStateSeparator="" />
+				<View
+					url="/chat"
+					preloadPreviousPage
+					reloadPages
+					main
+					// loadInitialPage
+					pushState
+					pushStateSeparator=""
+				/>
 			</App>
 		);
 	}

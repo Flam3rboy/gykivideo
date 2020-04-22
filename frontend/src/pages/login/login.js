@@ -41,7 +41,7 @@ class LoginPage extends React.Component {
 
 	render() {
 		return (
-			<Page name="login">
+			<Page name="login" noToolbar noNavbar noSwipeback loginScreen>
 				<Navbar title="Videokonferenz - Login" />
 				<div className="module">
 					<Container className="module-inside">
@@ -108,7 +108,7 @@ class LoginPage extends React.Component {
 								</Card>
 							</Col>
 						</Row>
-						<Row className="footer justify-content-center">
+						{/* <Row className="footer justify-content-center">
 							<Col lg="auto">
 								<Link
 									className="github"
@@ -119,7 +119,7 @@ class LoginPage extends React.Component {
 									Github
 								</Link>
 							</Col>
-						</Row>
+						</Row> */}
 					</Container>
 				</div>
 			</Page>

@@ -19,27 +19,25 @@ class Sidebar extends React.Component {
 				left
 				cover
 				resizable
-				className="sidebar show-desktop"
+				className="sidebar "
 			>
-				<View className="view-left">
-					<Page>
-						<Navbar title="Videokonferenz"></Navbar>
-						<List>
-							<ListItem link="/" title="Startseite">
-								<Icon slot="media" f7="house"></Icon>
-							</ListItem>
-							<ListItem link="/" title="Direktnachrichten">
-								<Icon slot="media" f7="chat_bubble_2_fill"></Icon>
-							</ListItem>
-							<ListItem link="/" title="Teams/Klassen">
-								<Icon slot="media" f7="person_3_fill"></Icon>
-							</ListItem>
-							<ListItem link="/" title="Einstellungen">
-								<Icon slot="media" f7="​​gear_alt_fill"></Icon>
-							</ListItem>
-						</List>
-					</Page>
-				</View>
+				<Page>
+					<Navbar title="Videokonferenz"></Navbar>
+					<List>
+						<ListItem href="/" title="Startseite">
+							<Icon slot="media" f7="house"></Icon>
+						</ListItem>
+						<ListItem onClick={this.$f7route} href="/chats" title="Direktnachrichten">
+							<Icon slot="media" f7="chat_bubble_2_fill"></Icon>
+						</ListItem>
+						<ListItem href="/" title="Teams/Klassen">
+							<Icon slot="media" f7="person_3_fill"></Icon>
+						</ListItem>
+						<ListItem href="/" title="Einstellungen">
+							<Icon slot="media" f7="​​gear_alt_fill"></Icon>
+						</ListItem>
+					</List>
+				</Page>
 			</Panel>
 		);
 	}

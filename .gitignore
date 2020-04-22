@@ -2,3 +2,4 @@ node_modules/
 
 backend/config.json
 build/
+backend/uploads/

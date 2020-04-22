@@ -16,11 +16,11 @@ import {
 	CardHeader,
 	CardContent,
 	List,
-	ListItem
+	ListItem,
 } from "framework7-react";
 import { connect } from "react-redux";
-import {Col, Row} from"react-bootstrap"
-import {CardBody} from "react-bootstrap/Card";
+import { Col, Row } from "react-bootstrap";
+import { CardBody } from "react-bootstrap/Card";
 
 class HomePage extends React.Component {
 	constructor(props) {
@@ -40,15 +40,14 @@ class HomePage extends React.Component {
 				<Navbar>
 					<NavLeft>
 						<Link color="black" onClick={this.props.sidebarOpen}>
-							<Icon f7="line_horizontal_3"/>
+							<Icon f7="line_horizontal_3" />
 						</Link>
 					</NavLeft>
 					<NavTitle>Home Page</NavTitle>
 				</Navbar>
 				<Block className="row">
-					<Col>
-
-						<Card className={"col-md-6"}>
+					<Col xs="12" md="6" lg="4">
+						<Card>
 							<CardHeader>Letzten Nachrichten</CardHeader>
 							<CardContent>
 								<List simple-list>
@@ -59,9 +58,8 @@ class HomePage extends React.Component {
 							</CardContent>
 						</Card>
 					</Col>
-					<Col>
-
-						<Card className={"col-md-6"}>
+					<Col xs="12" md="6" lg="4">
+						<Card>
 							<CardHeader>Termine</CardHeader>
 							<CardContent>
 								<List simple-list>
@@ -72,13 +70,10 @@ class HomePage extends React.Component {
 							</CardContent>
 						</Card>
 					</Col>
-					<Col>
-
-						<Card className={"col-md-6"}>
+					<Col xs="12" md="6" lg="4">
+						<Card>
 							<CardHeader>Stundenplan</CardHeader>
-							<CardContent>
-
-							</CardContent>
+							<CardContent></CardContent>
 						</Card>
 					</Col>
 				</Block>

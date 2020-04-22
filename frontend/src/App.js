@@ -37,6 +37,11 @@ class WebApp extends React.Component {
 		await this.init();
 	}
 
+	async componentDidMount() {
+		window.$f7 = this.$f7;
+		window.app = this.$f7;
+	}
+
 	async init() {
 		axios.defaults.baseURL = config.api;
 		var token = localStorage.getItem("token");

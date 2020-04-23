@@ -1,50 +1,71 @@
-const fs = require("fs");
-const express = require("express");
-var jwt = require("express-jwt");
-var guard = require("express-jwt-permissions")();
-const bodyParser = require("body-parser");
-const app = express();
-const server = require("http").Server(app);
-const io = require("socket.io")(server);
-const config = require("./config.json");
-const mongoose = require("mongoose");
-var guard = require("express-jwt-permissions")({
-	requestProperty: "user",
-	permissionsProperty: "permissions",
-});
-var path = __dirname + "/models/";
-var models = fs.readdirSync(path);
-models.forEach((file) => {
-	require(path + file);
-});
-app.guard = guard;
+(async () => {
+	const fs = require("fs");
+	const express = require("express");
+	var jwt = require("express-jwt");
+	var guard = require("express-jwt-permissions")();
+	const bodyParser = require("body-parser");
+	const app = express();
+	const server = require("http").Server(app);
+	const io = require("socket.io")(server);
+	const config = require("./config.json");
+	const unless = require("express-unless");
 
-const user = require("./user");
-const ws = require("./ws");
-const team = require("./team");
+	const mongoose = require("mongoose");
+	var guard = require("express-jwt-permissions")({
+		requestProperty: "user",
+		permissionsProperty: "permissions",
+	});
+	var path = __dirname + "/models/";
+	var models = fs.readdirSync(path);
+	models.forEach((file) => {
+		require(path + file);
+	});
+	app.guard = guard;
 
-mongoose.connect(config.database, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
+	const user = require("./user");
+	const ws = require("./ws");
+	const team = require("./team");
+	const file = require("./file");
 
-app.use(bodyParser());
-app.use(jwt({ secret: config.jwtsecret, expiresIn: config.jwtexpire }).unless({ path: ["/user/login"] }));
-app.use(guard.check([["student"], ["teacher"], ["admin"]]).unless({ path: "/user/login" }));
+	await mongoose.connect(config.database, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+		useFindAndModify: false,
+	});
 
-ws(io);
-user(app);
-team(app);
+	var noauth = {
+		path: [{ url: /\/file\/\w+\/[^\/].+/, methods: ["GET"] }, "/user/login"],
+		// strict: false,
+		// ext: ["png", "jpg"],
+	};
 
-app.use(function (err, req, res, next) {
-	if (err.code === "permission_denied") {
-		res.status(403).json({ success: false, error: "Forbidden" });
-	} else if (err.name === "UnauthorizedError") {
-		res.status(401).json({ success: false, error: "Invalid Token" });
-	} else if (err) {
-		res.status(400).json({ success: false, error: err.toString() });
-	} else {
-		next();
-	}
-});
+	var jwtTest = jwt({ secret: config.jwtsecret, expiresIn: config.jwtexpire });
+	jwtTest.unless = unless;
+	var guardCheck = guard.check([["student"], ["teacher"], ["admin"]]);
+	jwtTest.unless = unless;
 
-server.listen(2000, () => {
-	console.log("ready");
-});
+	app.use(bodyParser.json());
+	app.use(jwtTest.unless(noauth));
+	app.use(guardCheck.unless(noauth));
+
+	ws(io);
+	user(app);
+	team(app);
+	file(app);
+
+	app.use(function (err, req, res, next) {
+		if (err.code === "permission_denied") {
+			res.status(403).json({ success: false, error: "Forbidden" });
+		} else if (err.name === "UnauthorizedError") {
+			res.status(401).json({ success: false, error: "Invalid Token" });
+		} else if (err) {
+			res.status(400).json({ success: false, error: err.toString() });
+		} else {
+			next();
+		}
+	});
+
+	server.listen(2000, () => {
+		console.log("ready");
+	});
+})();

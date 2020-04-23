@@ -10,4 +10,17 @@ module.exports = (socket) => {
 	socket.on("*", function (event, data) {
 		console.log(event + ":", data);
 	});
+
+	var token = localStorage.getItem("token");
+
+	if (!token) return console.log("invalid token");
+
+	token = token.replace("Bearer ", "");
+
+	socket
+		.on("error", (error) => {
+			console.error(error);
+		})
+		.on("authenticated", function () {})
+		.emit("authenticate", { token });
 };

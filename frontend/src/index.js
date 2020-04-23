@@ -2,7 +2,8 @@ import "react-app-polyfill/ie11";
 import "react-app-polyfill/stable";
 import "bootstrap/dist/css/bootstrap-grid.min.css";
 import "framework7/css/framework7.bundle.min.css";
-import 'framework7-icons';
+import "framework7-icons";
+import "./resources/iconfont/material-icons.css";
 import "./index.scss";
 import React from "react";
 import ReactDOM from "react-dom";
@@ -28,6 +29,7 @@ const composeEnhancers =
 const enhancer = composeEnhancers();
 
 const store = createStore(allReducers, enhancer);
+global.store = store;
 axios.defaults.validateStatus = () => true;
 const socket = io("http://localhost:2000");
 

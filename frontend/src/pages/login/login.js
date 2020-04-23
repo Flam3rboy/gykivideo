@@ -9,13 +9,15 @@ import { connect } from "react-redux";
 class LoginPage extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {};
+		this.state = {
+			show: false,
+		};
 	}
 
-	componentDidUpdate() {
-		if (this.props.user.loggedin) {
-			this.$f7router.navigate("/", { animate: false, pushState: true });
-		}
+	componentDidMount() {
+		setTimeout(() => {
+			this.setState({ show: true });
+		}, 100);
 	}
 
 	saveInput = (e) => {
@@ -36,10 +38,16 @@ class LoginPage extends React.Component {
 		accessToken = "Bearer " + accessToken;
 		localStorage.setItem("token", accessToken);
 		this.props.login(user);
-		this.$f7router.navigate("/", { pushState: true });
+		this.$f7router.navigate("/", { animate: true, pushState: true });
 	};
 
 	render() {
+		if (this.props.user.loggedin) {
+			this.$f7router.navigate("/", { animate: false, pushState: true });
+		}
+
+		if (!this.state.show) return <div></div>;
+
 		return (
 			<Page name="login" noToolbar noNavbar noSwipeback loginScreen>
 				<Navbar title="Videokonferenz - Login" />
@@ -131,7 +139,10 @@ export default connect(
 	(s) => s,
 	(dispatch) => {
 		return {
-			login: (user) => dispatch({ type: "LOGIN", payload: user }),
+			login: (user) => {
+				dispatch({ type: "LOGIN", payload: user });
+				dispatch({ type: "SIDEBAR_OPEN", payload: user });
+			},
 			logout: (user) => dispatch({ type: "LOGOUT", payload: user }),
 		};
 	}

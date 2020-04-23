@@ -8,21 +8,37 @@ import HomePage from "./pages/home/home";
 import ChatPage from "./pages/chat/chat";
 import Sidebar from "./components/sidebar/sidebar";
 import { connect } from "react-redux";
+import "./e2ee";
+
+var on = {
+	pageBeforeIn: (e, page) => {
+		var state = global.store.getState();
+		var { user } = state;
+
+		console.log("loggedin:" + user.loggedin);
+
+		if (!user.loggedin) {
+			page.router.navigate("/login/");
+		}
+	},
+};
 
 const f7params = {
 	// Array with app routes
 	routes: [
 		{
-			path: "/login",
-			component: LoginPage,
-		},
-		{
 			path: "/",
+			on,
 			component: HomePage,
 		},
 		{
-			path: "/chat",
+			path: "/chat/",
+			on,
 			component: ChatPage,
+		},
+		{
+			path: "/login",
+			component: LoginPage,
 		},
 	],
 	touch: {
@@ -36,10 +52,7 @@ const f7params = {
 class WebApp extends React.Component {
 	constructor(props) {
 		super(props);
-	}
-
-	async componentWillMount() {
-		await this.init();
+		this.init();
 	}
 
 	async componentDidMount() {
@@ -51,26 +64,23 @@ class WebApp extends React.Component {
 		axios.defaults.baseURL = config.api;
 		var token = localStorage.getItem("token");
 		if (!token) return this.props.logout();
+		// this.props.login({});
 
 		axios.defaults.headers.common["Authorization"] = token;
 		var user = (await axios.get("/user")).data;
-		if (!user.success) this.props.logout();
-		else this.props.login(user);
+		if (!user.success) {
+			this.props.logout();
+		} else {
+			this.props.login(user);
+		}
+		this.forceUpdate();
 	}
 
 	render() {
 		return (
 			<App params={f7params}>
 				<Sidebar></Sidebar>
-				<View
-					url="/chat"
-					preloadPreviousPage
-					reloadPages
-					main
-					// loadInitialPage
-					pushState
-					pushStateSeparator=""
-				/>
+				<View preloadPreviousPage reloadPages main loadInitialPage pushState pushStateSeparator=""></View>
 			</App>
 		);
 	}

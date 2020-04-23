@@ -28,18 +28,12 @@ class HomePage extends React.Component {
 		this.state = {};
 	}
 
-	componentDidUpdate() {
-		if (!this.props.user.loggedin) {
-			this.$f7router.navigate("/login/", { animate: false, pushState: true });
-		}
-	}
-
 	render() {
 		return (
 			<Page name="home">
 				<Navbar>
 					<NavLeft>
-						<Link color="black" onClick={this.props.sidebarOpen}>
+						<Link color="black" panelOpen="left">
 							<Icon f7="line_horizontal_3" />
 						</Link>
 					</NavLeft>
@@ -85,9 +79,6 @@ class HomePage extends React.Component {
 export default connect(
 	(s) => s,
 	(dispatch) => {
-		return {
-			sidebarClose: () => dispatch({ type: "SIDEBAR_CLOSE" }),
-			sidebarOpen: () => dispatch({ type: "SIDEBAR_OPEN" }),
-		};
+		return {};
 	}
 )(HomePage);

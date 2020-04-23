@@ -1,6 +1,6 @@
-import axios from "axios"
+import axios from "axios";
 
-export function user(state = { id: "", loggedin: true, username: "", role: "" }, action) {
+export function user(state = { id: "", loggedin: false, username: "", role: "" }, action) {
 	switch (action.type) {
 		case "LOGIN":
 			return { ...action.payload, loggedin: true };

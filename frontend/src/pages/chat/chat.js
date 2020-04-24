@@ -1,10 +1,12 @@
-import React from "react";
+import React, { Component, Fragment } from "react";
 import {
 	Page,
 	Navbar,
 	NavTitle,
 	Messagebar,
 	Link,
+	Icon,
+	NavLeft,
 	MessagebarAttachment,
 	MessagebarAttachments,
 	Messages,
@@ -14,10 +16,9 @@ import {
 	MessagesTitle,
 } from "framework7-react";
 import { connect } from "react-redux";
-import { Col, Row } from "react-bootstrap";
-import { CardBody } from "react-bootstrap/Card";
+import "./chat.scss";
 
-class HomePage extends React.Component {
+class HomePage extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -99,6 +100,8 @@ class HomePage extends React.Component {
 				},
 			],
 			answers: [
+				"😂",
+				"https://www.youtube.com/watch?v=WnFoNJvtFis",
 				"Yes!",
 				"No",
 				"Hm...",
@@ -118,17 +121,26 @@ class HomePage extends React.Component {
 
 	render() {
 		return (
-			<Page name="home">
+			<Page name="chat" className="chat">
 				<Navbar>
-					<NavTitle>Chats</NavTitle>
+					<NavLeft>
+						<Link color="black" panelOpen="left">
+							<Icon f7="line_horizontal_3" />
+						</Link>
+					</NavLeft>
+					<NavTitle large titleLarge="Chats">
+						Chats
+					</NavTitle>
 				</Navbar>
 				<Messagebar
+					ref="test"
 					placeholder={this.placeholder}
 					ref={(el) => {
 						this.messagebarComponent = el;
 					}}
 					attachmentsVisible={this.attachmentsVisible}
 					sheetVisible={this.state.sheetVisible}
+					onSubmit={this.sendMessage.bind(this)}
 				>
 					<Link
 						iconIos="f7:camera_fill"
@@ -139,13 +151,9 @@ class HomePage extends React.Component {
 							this.setState({ sheetVisible: !this.state.sheetVisible });
 						}}
 					></Link>
-					<Link
-						iconIos="f7:arrow_up_circle_fill"
-						iconAurora="f7:arrow_up_circle_fill"
-						iconMd="material:send"
-						slot="inner-end"
-						onClick={this.sendMessage.bind(this)}
-					></Link>
+					<Link slot="inner-end" onClick={this.sendMessage.bind(this)}>
+						<Icon ios="f7:paperplane_fill" aurora="f7:paperplane_fill" md="material:send"></Icon>
+					</Link>
 					<MessagebarAttachments>
 						{this.state.attachments.map((image, index) => (
 							<MessagebarAttachment
@@ -168,6 +176,7 @@ class HomePage extends React.Component {
 				</Messagebar>
 
 				<Messages
+					scrollMessagesOnEdge
 					ref={(el) => {
 						this.messagesComponent = el;
 					}}
@@ -176,20 +185,7 @@ class HomePage extends React.Component {
 						<b>Sunday, Feb 9,</b> 12:58
 					</MessagesTitle>
 
-					{this.state.messagesData.map((message, index) => (
-						<Message
-							key={index}
-							type={message.type}
-							image={message.image}
-							name={message.name}
-							avatar={message.avatar}
-							first={this.isFirstMessage(message, index)}
-							last={this.isLastMessage(message, index)}
-							tail={this.isTailMessage(message, index)}
-						>
-							{message.text && <span slot="text" dangerouslySetInnerHTML={{ __html: message.text }} />}
-						</Message>
-					))}
+					{this.state.messagesData.map(this.renderMessage.bind(this))}
 					{this.state.typingMessage && (
 						<Message
 							type="received"
@@ -206,6 +202,104 @@ class HomePage extends React.Component {
 		);
 	}
 
+	renderMessage(message, index) {
+		var { text } = message;
+
+		var end = [];
+		if (text) {
+			var emoji_regex = /^(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|[\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|[\ud83c[\ude32-\ude3a]|[\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])+$/;
+
+			var textContainsOnlyEmoji = emoji_regex.test(text);
+
+			var text = text.split("\n").map((part, ind) => {
+				const linksFound = part.match(/(?:www|https?)[^\s]+/g);
+				if (!linksFound) {
+					return part;
+				}
+
+				var toReturn = linksFound.map((link, i) => {
+					const aLink = [];
+					let replace = linksFound[i];
+
+					if (!linksFound[i].match(/(http(s?)):\/\//)) {
+						replace = "http://" + linksFound[i];
+					}
+					let linkText = replace.split("/")[2];
+					if (linkText.substring(0, 3) == "www") {
+						linkText = linkText.replace("www.", "");
+					}
+					var youtube = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+					var match = replace.match(youtube);
+					if (match && match[2].length == 11) {
+						end.push(
+							<iframe
+								src={"https://www.youtube.com/embed/" + match[2]}
+								frameBorder="0"
+								allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+								allowFullScreen
+							></iframe>
+						);
+					} else if (linkText.match(/vimeo/)) {
+						let vimeoID = replace.split("/").slice(-1)[0];
+						end.push(
+							<iframe
+								src={"https://player.vimeo.com/video/" + vimeoID}
+								frameBorder="0"
+								webkitallowfullscreen
+								mozallowfullscreen
+								allowfullscreen
+							></iframe>
+						);
+					} else {
+						aLink.push(
+							<a external href={replace} target="_blank">
+								{replace}
+							</a>
+						);
+						var first = part.split(link)[0];
+						var last = part.split(link)[1];
+						return (
+							<span>
+								{first}
+								{aLink[i]}
+								{last}
+							</span>
+						);
+					}
+				});
+				if (ind < text.split("\n").length - 1) {
+					toReturn.push(<br></br>);
+				}
+				console.log(toReturn);
+
+				if (!toReturn[0]) toReturn = null;
+				return toReturn;
+			});
+			if (!text[0] || textContainsOnlyEmoji) text = null;
+
+			if (textContainsOnlyEmoji) {
+				end.push(<h1>{message.text}</h1>);
+			}
+		}
+
+		return (
+			<Message
+				key={index}
+				type={message.type}
+				image={message.image}
+				name={message.name}
+				avatar={message.avatar}
+				first={this.isFirstMessage(message, index)}
+				last={this.isLastMessage(message, index)}
+				tail={this.isTailMessage(message, index)}
+			>
+				{text && <div slot="text">{text}</div>}
+
+				<div slot="content-end">{end}</div>
+			</Message>
+		);
+	}
+
 	get attachmentsVisible() {
 		const self = this;
 		return self.state.attachments.length > 0;
@@ -217,11 +311,25 @@ class HomePage extends React.Component {
 
 	componentDidMount() {
 		const self = this;
+
 		self.$f7ready(() => {
 			self.messagebar = self.messagebarComponent.f7Messagebar;
 			self.messages = self.messagesComponent.f7Messages;
+			self.messagebar.$textareaEl[0].addEventListener("keypress", self.onKeyPress);
 		});
 	}
+
+	componentWillUnmount() {
+		this.messagebar.$textareaEl[0].removeEventListener("keypress", this.onKeyPress);
+	}
+
+	onKeyPress = (e) => {
+		if (e.keyCode === 13 && this.$f7.device.desktop && !e.shiftKey) {
+			e.preventDefault();
+			console.log("send");
+			this.sendMessage();
+		}
+	};
 
 	isFirstMessage(message, index) {
 		const self = this;
@@ -273,7 +381,7 @@ class HomePage extends React.Component {
 
 	sendMessage() {
 		const self = this;
-		const text = self.messagebar.getValue().replace(/\n/g, "<br>").trim();
+		const text = self.messagebar.getValue().trim();
 		const messagesToSend = [];
 		self.state.attachments.forEach((attachment) => {
 			messagesToSend.push({
@@ -330,8 +438,8 @@ class HomePage extends React.Component {
 					typingMessage: null,
 					responseInProgress: false,
 				});
-			}, 4000);
-		}, 1000);
+			}, 0);
+		}, 0);
 	}
 }
 
@@ -341,3 +449,6 @@ export default connect(
 		return {};
 	}
 )(HomePage);
+// TODO
+// apple-touch-startup-image
+// PWA: https://www.netguru.com/codestories/few-tips-that-will-make-your-pwa-on-ios-feel-like-native

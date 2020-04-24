@@ -1,0 +1,35 @@
+.chat {
+	.messages {
+		.message {
+			.message-content {
+				div[slot="content-end"] {
+					margin-left: 10px;
+					display: flex;
+					flex-direction: column;
+
+					h1 {
+						margin: 0 0.5rem;
+					}
+
+					iframe {
+						border-radius: var(--f7-message-bubble-border-radius);
+					}
+				}
+				.message-bubble:empty {
+					display: none;
+				}
+				.message-text {
+					.text {
+						a {
+						}
+					}
+				}
+			}
+		}
+		.message-sent {
+			a {
+				color: white;
+			}
+		}
+	}
+}

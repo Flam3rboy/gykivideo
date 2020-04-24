@@ -55,6 +55,10 @@ class WebApp extends React.Component {
 		this.init();
 	}
 
+	componentWillMount() {
+		window.InitialPage = window.location.pathname;
+	}
+
 	async componentDidMount() {
 		window.$f7 = this.$f7;
 		window.app = this.$f7;

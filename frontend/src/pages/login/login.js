@@ -38,12 +38,12 @@ class LoginPage extends React.Component {
 		accessToken = "Bearer " + accessToken;
 		localStorage.setItem("token", accessToken);
 		this.props.login(user);
-		this.$f7router.navigate("/", { animate: true, pushState: true });
+		this.$f7router.navigate(window.InitialPage, { animate: true, pushState: true });
 	};
 
 	render() {
 		if (this.props.user.loggedin) {
-			this.$f7router.navigate("/", { animate: false, pushState: true });
+			this.$f7router.navigate(window.InitialPage, { animate: false, pushState: true });
 		}
 
 		if (!this.state.show) return <div></div>;

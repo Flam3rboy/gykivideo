@@ -34,18 +34,17 @@ class Sidebar extends React.Component {
 			>
 				<Page>
 					<Navbar title="Videokonferenz"></Navbar>
-					<Link href="/chat/">test</Link>
 					<List>
-						<ListItem href="/" title="Startseite">
+						<ListItem panelClose href="/" title="Startseite">
 							<Icon slot="media" f7="house"></Icon>
 						</ListItem>
-						<ListItem href="/chat/" title="Direktnachrichten">
+						<ListItem panelClose href="/chat/" title="Direktnachrichten">
 							<Icon slot="media" f7="chat_bubble_2_fill"></Icon>
 						</ListItem>
-						<ListItem href="" title="Teams/Klassen">
+						<ListItem panelClose href="" title="Teams/Klassen">
 							<Icon slot="media" f7="person_3_fill"></Icon>
 						</ListItem>
-						<ListItem href="" title="Einstellungen">
+						<ListItem panelClose href="" title="Einstellungen">
 							<Icon slot="media" f7="​​gear_alt_fill"></Icon>
 						</ListItem>
 					</List>

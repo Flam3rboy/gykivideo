@@ -69,7 +69,7 @@
 		}
 	});
 
-	server.listen(2000, () => {
-		console.log("ready");
+	server.listen(config.port, () => {
+		console.log("ready on " + config.port);
 	});
 })();

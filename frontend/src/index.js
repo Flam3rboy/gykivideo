@@ -1,5 +1,5 @@
-import "react-app-polyfill/ie11";
-import "react-app-polyfill/stable";
+// import "react-app-polyfill/ie11";
+// import "react-app-polyfill/stable";
 import "bootstrap/dist/css/bootstrap-grid.min.css";
 import "framework7/css/framework7.bundle.min.css";
 import "framework7-icons";
@@ -14,9 +14,10 @@ import axios from "axios";
 import { createStore, compose } from "redux";
 import { Provider } from "react-redux";
 import App from "./App";
-import * as serviceWorker from "./serviceWorker";
+// import * as serviceWorker from "./serviceWorker";
 import ws from "./ws";
 import allReducers from "./reducers/";
+import config from "./config.json";
 
 const composeEnhancers =
 	typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
@@ -31,7 +32,8 @@ const enhancer = composeEnhancers();
 const store = createStore(allReducers, enhancer);
 global.store = store;
 axios.defaults.validateStatus = () => true;
-const socket = io("http://localhost:2000");
+window.io = io;
+const socket = io();
 
 global.socket = socket;
 ws(socket);
@@ -47,4 +49,4 @@ ReactDOM.render(
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.register();
+// serviceWorker.unregister();

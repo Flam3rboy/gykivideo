@@ -38,9 +38,6 @@ module.exports = (io) => {
 		});
 
 		socket
-			.on("room", (room) => {
-				socket.join(room);
-			})
 			.on("disconnect", (reason) => {
 				// if (["ping timeout", "transport close", "transport error"].includes(reason)) {}
 				console.error("[socket.io] Disconnect - " + reason);
@@ -48,6 +45,6 @@ module.exports = (io) => {
 			.on("error", (error) => {
 				console.error(error);
 			})
-			.on("message", (message) => {});
+			.on("st", (message) => {});
 	});
 };

@@ -22,6 +22,8 @@
 	});
 	app.guard = guard;
 
+	const link = require("./link");
+	const channel = require("./channel");
 	const user = require("./user");
 	const ws = require("./ws");
 	const team = require("./team");
@@ -52,6 +54,8 @@
 	user(app);
 	team(app);
 	file(app);
+	channel(app);
+	link(app);
 
 	app.use(function (err, req, res, next) {
 		if (err.code === "permission_denied") {

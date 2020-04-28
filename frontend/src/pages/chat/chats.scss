@@ -1,0 +1,41 @@
+.chatSelectionSidebar {
+	.search {
+		padding: 15px;
+		padding-bottom: 0;
+	}
+
+	.chatListSidebar {
+		--f7-list-item-subtitle-font-size: 13px;
+		--f7-list-font-size: 13px;
+
+		.item-content {
+			padding-left: calc(10px + var(--f7-safe-area-left));
+
+			.item-inner {
+				margin-left: 10px;
+			}
+
+			.icon,
+			img {
+				width: 34px;
+				font-size: 34px;
+				border-radius: 1000px;
+			}
+		}
+	}
+}
+
+.device-desktop {
+	.chatSelectionSidebar {
+		.chatListSidebar {
+			--f7-list-item-subtitle-font-size: 15px;
+			--f7-list-font-size: 15px;
+			.icon,
+			img {
+				width: 44px;
+				font-size: 44px;
+				border-radius: 1000px;
+			}
+		}
+	}
+}

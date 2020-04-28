@@ -1,7 +1,8 @@
 import "./sidebar.scss";
 import React from "react";
-import { View, Page, Navbar, Panel, Icon, List, ListItem, Link } from "framework7-react";
+import { View, Page, Navbar, Panel, Icon, List, ListItem, Link, NavTitle, NavLeft } from "framework7-react";
 import { connect } from "react-redux";
+import ChatsSidebar from "../../pages/chat/chats";
 
 class Sidebar extends React.Component {
 	constructor(props) {
@@ -16,11 +17,13 @@ class Sidebar extends React.Component {
 					s.params.visibleBreakpoint = 1024;
 					s.enableVisibleBreakpoint();
 				} else {
-					s.params.visibleBreakpoint = 102400;
+					s.params.visibleBreakpoint = 100000;
 					s.disableVisibleBreakpoint();
 				}
 			}
 		}
+
+		var route = this.props.location.pathname;
 
 		return (
 			<Panel
@@ -28,26 +31,53 @@ class Sidebar extends React.Component {
 				left
 				swipe
 				swipeActiveArea={40}
-				cover
-				resizable
+				reveal
 				className="sidebar"
 			>
 				<Page>
-					<Navbar title="Videokonferenz"></Navbar>
-					<List>
-						<ListItem panelClose href="/" title="Startseite">
-							<Icon slot="media" f7="house"></Icon>
-						</ListItem>
-						<ListItem panelClose href="/chat/" title="Direktnachrichten">
-							<Icon slot="media" f7="chat_bubble_2_fill"></Icon>
-						</ListItem>
-						<ListItem panelClose href="" title="Teams/Klassen">
-							<Icon slot="media" f7="person_3_fill"></Icon>
-						</ListItem>
-						<ListItem panelClose href="" title="Einstellungen">
-							<Icon slot="media" f7="​​gear_alt_fill"></Icon>
-						</ListItem>
-					</List>
+					<div className="multiPanel">
+						<List className="menuList">
+							<ListItem
+								noChevron
+								panelClose
+								href="/"
+								// title="Startseite"
+							>
+								<Icon slot="media" f7="house"></Icon>
+							</ListItem>
+
+							<ListItem
+								noChevron
+								href="/chat/"
+								// title="Direktnachrichten"
+							>
+								<Icon slot="media" f7="chat_bubble_2_fill"></Icon>
+							</ListItem>
+							<ListItem
+								noChevron
+								href="/team/"
+								// title="Teams/Klassen"
+							>
+								<Icon slot="media" f7="person_3_fill"></Icon>
+							</ListItem>
+							<ListItem
+								noChevron
+								panelClose
+								href="/settings"
+								className="settings"
+								// title="Einstellungen"
+							>
+								<Icon slot="media" f7="​​gear_alt_fill"></Icon>
+							</ListItem>
+						</List>
+						<div className="panel-chat">
+							{(() => {
+								if (route.includes("/chat/")) {
+									return <ChatsSidebar></ChatsSidebar>;
+								}
+							})()}
+						</div>
+					</div>
 				</Page>
 			</Panel>
 		);

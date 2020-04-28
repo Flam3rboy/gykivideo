@@ -74,3 +74,14 @@ div[data-name="login"] {
 		}
 	}
 }
+
+html.device-ios,
+html.device-android {
+	background: black;
+	div[data-name="login"] {
+		.container,
+		.col {
+			padding: 0 !important;
+		}
+	}
+}

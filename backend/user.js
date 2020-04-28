@@ -4,6 +4,7 @@ var jwt = require("jsonwebtoken");
 const fetch = require("node-fetch");
 var FormData = require("form-data");
 const config = require("./config.json");
+const Channel = mongoose.model("Channel");
 const User = mongoose.model("User");
 const Team = mongoose.model("Team");
 const { ObjectId } = mongoose.Types;
@@ -25,8 +26,8 @@ module.exports = (app) => {
 		try {
 			var id = req.user.id;
 
-			var teams = await Team.find({ users: id });
-			var teams = teams.map((team) => {
+			var teams = await Team.find({ users: id }).exec();
+			teams = teams.map((team) => {
 				var { id, users, name } = team;
 				return { id, users, name };
 			});
@@ -37,14 +38,49 @@ module.exports = (app) => {
 		}
 	});
 
+	app.get("/user/dms", async (req, res, next) => {
+		try {
+			var id = req.user.id;
+
+			var dms = await Channel.find({ recipients: id }, "-messages");
+			dms = dms.map((dm) => {
+				var { recipients, team, id } = dm;
+				return { recipients, team, id };
+			});
+
+			res.status(200).json({ success: true, dms });
+		} catch (error) {
+			next(error);
+		}
+	});
+
+	app.post("/user/setKey", async (req, res, next) => {
+		try {
+			if (!req.body) throw new Error("POST must contain body");
+			if (!req.body.RSA) throw new Error("Bitte übergebe einen RSA Schlüssel");
+			if (!req.body.RSA.privateKey) throw new Error("Bitte übergebe einen privaten RSA Schlüssel");
+			if (!req.body.RSA.publicKey) throw new Error("Bitte übergebe einen öffentlichen RSA Schlüssel");
+			var { privateKey, publicKey } = req.body.RSA;
+
+			var userid = req.user.id;
+
+			var user = await User.findByIdAndUpdate(userid, { $set: { privateKey, publicKey } }).exec();
+
+			res.status(200).json({ success: true, ...user });
+		} catch (error) {
+			next(error);
+		}
+	});
+
 	app.post("/user/login", async (req, res, next) => {
 		try {
 			if (!req.body) throw new Error("POST must contain body");
-			var { username, password, role } = req.body;
+			var { username, password, role, privateKey, publicKey } = req.body;
 			if (!role) role = "student";
 			if (!["student", "teacher", "admin"].includes(role)) throw new Error("Unbekannte Nutzerrolle");
 
 			var user = await User.findOne({ username }).exec();
+			var needRSAKey = false;
 			var teams;
 			if (!user || !user.password) {
 				var loginRes = await login(role, { username, password });
@@ -57,8 +93,13 @@ module.exports = (app) => {
 					var userTeam = await Team.findOne({ name: className }).exec();
 
 					if (!userTeam) {
+						var timetable;
 						// create team if it doesn't exist
-						var timetable = convertTimetable(loginRes.plan);
+						if (loginRes.plan) {
+							timetable = convertTimetable(loginRes.plan);
+						} else {
+							timetable = undefined;
+						}
 						userTeam = await new Team({ name: className, timetable, users: [], teams: [] }).save();
 					}
 				} else if (role === "teacher") {
@@ -89,13 +130,23 @@ module.exports = (app) => {
 				expiresIn: config.jwtexpire,
 			});
 
+			if (!user.privateKey || !user.publicKey) {
+				needRSAKey = true;
+			} else {
+				privateKey = user.privateKey;
+				publicKey = user.publicKey;
+			}
+
 			var toReturn = {
 				success: true,
 				accessToken,
+				needRSAKey,
 				user: {
 					username,
 					id: user.id,
 					role,
+					privateKey, // private key is encrypted saved with users aes password key
+					publicKey,
 				},
 			};
 
@@ -169,14 +220,22 @@ async function loginStudent({ username, password }) {
 					user: {
 						username,
 						password,
-						class: klasse,
+						class: "9C",
 					},
-					plan,
 				};
 			case 1:
 			case 3:
 				throw new Error("Zu Oft falsch eingegeben: Bitte versuche es in " + status.B + " minuten erneut");
 			case 2:
+				return {
+					success: true,
+					user: {
+						username,
+						password,
+						class: klasse,
+					},
+					plan: undefined,
+				};
 				throw new Error("Benutzername oder Passwort falsch");
 		}
 	} catch (error) {

@@ -17,6 +17,10 @@ code {
 html,
 body {
 	position: fixed;
+	top: 0;
+	// left: 24px;
+	// right: 24px;
+	bottom: 0;
 	overflow: hidden;
 }
 

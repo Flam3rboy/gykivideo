@@ -26,8 +26,7 @@
 		height: 100%;
 		width: 100%;
 
-		.panel-chat,
-		.icon {
+		.panel-chat {
 			width: calc(100% - 50px);
 		}
 
@@ -117,10 +116,6 @@
 	.sidebar {
 		width: 450px;
 		.multiPanel {
-			.panel-chat,
-			.icon {
-				width: calc(100% - 80px);
-			}
 			.menuList {
 				width: 80px;
 				min-width: 80px;

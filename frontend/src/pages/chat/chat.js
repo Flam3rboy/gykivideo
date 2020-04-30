@@ -468,6 +468,7 @@ class ChatPage extends Component {
 		if (msg.image) {
 			var photoBrowser = this.$f7.photoBrowser
 				.create({
+					url: "",
 					photos: [msg.image],
 				})
 				.open();
@@ -520,7 +521,6 @@ class ChatPage extends Component {
 	}
 
 	componentDidUpdate = () => {
-		console.log("bind");
 		this.$$(".message").off("touchstart", this.doubleTapMessage);
 		this.$$(".message").off("contextmenu", this.contextMenuMessage);
 		this.$$(".message").off("taphold", this.contextMenuMessage);

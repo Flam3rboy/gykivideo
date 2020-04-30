@@ -22,6 +22,7 @@
 	});
 	app.guard = guard;
 
+	const search = require("./search");
 	const link = require("./link");
 	const channel = require("./channel");
 	const user = require("./user");
@@ -56,6 +57,7 @@
 	file(app);
 	channel(app);
 	link(app);
+	search(app);
 
 	app.use(function (err, req, res, next) {
 		if (err.code === "permission_denied") {

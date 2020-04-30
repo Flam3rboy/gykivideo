@@ -22,6 +22,32 @@ module.exports = (app) => {
 		}
 	});
 
+	app.get("/users/:id", async (req, res, next) => {
+		try {
+			if (!req.params.id) throw new Error("Bitte gib die Nutzerid ein");
+			var user = await User.findById(req.params.id).exec();
+			if (!user) throw new Error("Nutzer nicht gefunden");
+			var { id, username, role, publicKey } = user;
+
+			res.json({ success: true, id, username, role, publicKey });
+		} catch (error) {
+			next(error);
+		}
+	});
+
+	app.post("/user", async (req, res, next) => {
+		// update userinfo
+		try {
+			var user = await User.findById(req.user.id).exec();
+			if (!user) throw new Error("Nutzer nicht gefunden");
+			var { id, username, role } = user;
+
+			res.json({ success: true, id, username, role });
+		} catch (error) {
+			next(error);
+		}
+	});
+
 	app.get("/user/teams", async (req, res, next) => {
 		try {
 			var id = req.user.id;
@@ -45,6 +71,7 @@ module.exports = (app) => {
 			var dms = await Channel.find({ recipients: id }, "-messages");
 			dms = dms.map((dm) => {
 				var { recipients, team, id } = dm;
+				User.find({});
 				return { recipients, team, id };
 			});
 

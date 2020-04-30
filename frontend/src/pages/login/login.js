@@ -33,8 +33,6 @@ class LoginPage extends React.Component {
 
 	login = async () => {
 		var { role, username, password } = this.state;
-
-		var privateKey, publicKey;
 		var e2ee = new E2EE();
 
 		var json = (await axios.post("/user/login", { role, username, password })).data;
@@ -45,45 +43,54 @@ class LoginPage extends React.Component {
 		axios.defaults.headers.common["Authorization"] = accessToken;
 		localStorage.setItem("token", accessToken);
 		this.props.login(user);
+		var aes = await e2ee.generateAES({ username, password }); // returns secret aes cryptokey
+		var toSend = { privateKey: "", publicKey: "" };
 
-		var AES = await e2ee.generateAES({ password, username });
-		var jwkAES = await crypto.subtle.exportKey("jwk", AES);
-		var da = 2;
 		if (needRSAKey) {
-			var RSA = await e2ee.generateRSA();
-			privateKey = RSA.privateKey;
-			publicKey = RSA.publicKey;
+			var rsa = await e2ee.generateRSA(); // returns rsa crypto keypair
 
-			var encryptedRSA = await e2ee.wrapRSAKeyWithAES({ RSA, AES });
-			console.log({ encryptedRSA, RSA });
+			publicKey = rsa.publicKey;
+			privateKey = rsa.privateKey;
 
-			encryptedRSA.publicKey = e2ee.toPem({
-				publicKey: await crypto.subtle.exportKey("spki", RSA.publicKey),
-			});
+			toSend.privateKey = await e2ee.encryptRSAPrivateKeyWithAES({ aes, rsa }); // returns arraybuffer
+			toSend.privateKey = e2ee.toPem({ privateKey: toSend.privateKey });
 
-			await axios.post("/user/setKey", { RSA: encryptedRSA });
+			toSend.publicKey = await e2ee.exportPublicKey(rsa);
+			toSend.publicKey = e2ee.toPem({ publicKey: toSend.publicKey });
+
+			await axios.post("/user/setKey", { RSA: toSend });
+
+			toSend.privateKey = e2ee.toPem({ privateKey: await e2ee.exportPrivateKey(rsa) });
+			debugger;
 		} else {
 			var { privateKey, publicKey } = user;
-			privateKey = e2ee.fromPem(privateKey);
-			publicKey = e2ee.fromPem(publicKey);
+			privateKey = e2ee.fromPem(privateKey); //returns encrypted array buffer
+			publicKey = e2ee.fromPem(publicKey); // returns ArrayBuffer
+
+			toSend.publicKey = publicKey;
 
 			try {
+				toSend.publicKey = e2ee.toPem({ publicKey: publicKey });
 				publicKey = await crypto.subtle.importKey("spki", publicKey, e2ee.rsaAlg, true, []);
-				privateKey = await crypto.subtle.unwrapKey("jwk", privateKey, AES, e2ee.aesAlg, e2ee.rsaAlg, true, [
-					"decrypt",
+
+				privateKey = await e2ee.decryptRSAPrivateKeyWithAES({ encrypted: privateKey, aes }); // returns private key array buffer
+				privateKey = await window.crypto.subtle.importKey("pkcs8", privateKey, e2ee.rsaAlg, true, [
+					"deriveKey",
+					"deriveBits",
 				]);
+				toSend.privateKey = e2ee.toPem({ privateKey: await e2ee.exportPrivateKey({ privateKey }) });
 			} catch (error) {
 				console.error({ error });
 			}
 		}
 
-		console.log({ privateKey, publicKey, AES, RSA });
+		// private/public key are crypto keys
+		// toSend are PEM encoded keys
 
-		localStorage.setItem("publickey", e2ee.toPem({ publicKey: await crypto.subtle.exportKey("spki", publicKey) }));
-		localStorage.setItem(
-			"privatekey",
-			e2ee.toPem({ privateKey: await crypto.subtle.exportKey("pkcs8", privateKey) })
-		);
+		console.log({ privateKey, publicKey, toSend });
+
+		localStorage.setItem("publickey", toSend.publicKey);
+		localStorage.setItem("privatekey", toSend.privateKey);
 	};
 
 	// var rsaAlg = {

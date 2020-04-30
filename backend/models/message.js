@@ -5,6 +5,5 @@ module.exports = mongoose.model("Message", {
 	content: String,
 	read: Boolean,
 	reply: ObjectId,
-	type: String, // dm, channel
 	timestamp: Date,
 });

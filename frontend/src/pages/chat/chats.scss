@@ -4,6 +4,12 @@
 		padding-bottom: 0;
 	}
 
+	.addChat {
+		width: auto;
+		margin: 0 5px;
+		margin-left: 10px;
+	}
+
 	.chatListSidebar {
 		--f7-list-item-subtitle-font-size: 13px;
 		--f7-list-font-size: 13px;
@@ -26,15 +32,20 @@
 }
 
 .device-desktop {
-	.chatSelectionSidebar {
-		.chatListSidebar {
-			--f7-list-item-subtitle-font-size: 15px;
-			--f7-list-font-size: 15px;
-			.icon,
-			img {
-				width: 44px;
-				font-size: 44px;
-				border-radius: 1000px;
+	.sidebar {
+		.chatSelectionSidebar {
+			.chatListSidebar {
+				.icon {
+					width: calc(100% - 80px);
+				}
+				--f7-list-item-subtitle-font-size: 15px;
+				--f7-list-font-size: 15px;
+				.icon,
+				img {
+					width: 44px;
+					font-size: 44px;
+					border-radius: 1000px;
+				}
 			}
 		}
 	}

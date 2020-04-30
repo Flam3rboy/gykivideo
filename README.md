@@ -15,3 +15,7 @@
 -   Schulen einbinden, eigene Datenbank
 -   Invites
 -   Finanzierung
+
+## Key Managment:
+
+![](keyManagement.png)

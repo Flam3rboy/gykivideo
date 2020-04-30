@@ -2,11 +2,15 @@ export default class E2EE {
 	aesAlg = { name: "AES-GCM", iv: this.generateRandomValues(), length: 256 };
 
 	get rsaAlg() {
+		// return {
+		// 	name: "RSA-OAEP",
+		// 	modulusLength: 2048, // can be 1024, 2048 or 4096
+		// 	publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+		// 	hash: "SHA-256", // or SHA-512
+		// };
 		return {
-			name: "RSA-OAEP",
-			modulusLength: 2048, // can be 1024, 2048 or 4096
-			publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
-			hash: "SHA-256", // or SHA-512
+			name: "ECDH",
+			namedCurve: "P-384",
 		};
 	}
 
@@ -16,17 +20,6 @@ export default class E2EE {
 			iterations: 2048,
 			hash: "SHA-256",
 		};
-	}
-
-	async importPemKeys({ privateKey, publicKey }) {
-		privateKey = this.fromPem(privateKey);
-		publicKey = this.fromPem(publicKey);
-		publicKey = await window.crypto.subtle.importKey("spki", publicKey, this.rsaAlg, true, ["encrypt", "decrypt"]);
-		privateKey = await window.crypto.subtle.importKey("pkcs8", privateKey, this.rsaAlg, true, [
-			"encrypt",
-			"decrypt",
-		]);
-		return { privateKey, publicKey };
 	}
 
 	arrayBufferToBase64(arrayBuffer) {
@@ -75,40 +68,26 @@ export default class E2EE {
 	fromPem(key) {
 		return this.base64ToArrayBuffer(
 			key
-				.replace("-----BEGIN PRIVATE KEY-----\n", "")
+				.replace("-----BEGIN PRIVATE KEY-----", "")
 				.replace("-----END PRIVATE KEY-----", "")
-				.replace("-----BEGIN PUBLIC KEY-----\n", "")
+				.replace("-----BEGIN PUBLIC KEY-----", "")
 				.replace("-----END PUBLIC KEY-----", "")
 				.replace(/\n/g, "")
 		);
 	}
 
 	async generateRSA() {
-		// Let's generate the key pair first
-		var keyPair = await window.crypto.subtle.generateKey(this.rsaAlg, true, ["encrypt", "decrypt"]);
-
-		// var publicKey = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
-		// var privateKey = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
-		// publicKey = this.toPem({ publicKey });
-		// privateKey = this.toPem({ privateKey });
-		return keyPair;
+		return window.crypto.subtle.generateKey(this.rsaAlg, true, ["deriveKey", "deriveBits"]);
 	}
 
-	async wrapRSAKeyWithAES({ RSA, AES }) {
-		var wrap = await crypto.subtle.wrapKey("jwk", RSA.privateKey, AES, this.aesAlg);
-		console.log({ wrap, RSA, AES });
-
-		var encryptedRSA = {
-			privateKey: this.toPem({ privateKey: wrap }),
-			wrap,
-		};
-
-		return encryptedRSA; //crypto.subtle.importKey("raw", wrap, this.aesAlg, true, ["encrypt", "decrypt"]);
-	}
-
-	generateRandomValues() {
-		return new Uint8Array(12).map((x, i) => i * 2);
-		// return window.crypto.getRandomValues(new Uint8Array(12));
+	async deriveSecretKey({ publicKey, privateKey }) {
+		return window.crypto.subtle.deriveKey(
+			{ name: "ECDH", public: publicKey },
+			privateKey,
+			{ name: "AES-GCM", length: 256 },
+			false,
+			["encrypt", "decrypt"]
+		);
 	}
 
 	async generateAES({ password, username }) {
@@ -126,9 +105,60 @@ export default class E2EE {
 			key,
 			this.aesAlg,
 			true,
-			["encrypt", "decrypt", "wrapKey", "unwrapKey"]
+			["encrypt", "decrypt"]
 		);
 
 		return webKey;
 	}
+
+	generateRandomValues() {
+		return new Uint8Array(12).map((x, i) => i * 2);
+		// return window.crypto.getRandomValues(new Uint8Array(12));
+	}
+
+	async encryptRSAPrivateKeyWithAES({ rsa, aes }) {
+		var arrayBufferPrivateKey = await this.exportPrivateKey(rsa);
+		return window.crypto.subtle.encrypt(this.aesAlg, aes, arrayBufferPrivateKey);
+	}
+
+	async decryptRSAPrivateKeyWithAES({ encrypted, aes }) {
+		return crypto.subtle.decrypt(this.aesAlg, aes, encrypted);
+	}
+
+	async exportPrivateKey(rsa) {
+		return window.crypto.subtle.exportKey("pkcs8", rsa.privateKey);
+	}
+
+	async exportPublicKey(rsa) {
+		return window.crypto.subtle.exportKey("spki", rsa.publicKey);
+	}
+
+	async exportAesKey(aes) {
+		return window.crypto.subtle.exportKey("raw", aes);
+	}
+
+	async importPemKeys() {
+		var privateKey = this.fromPem(localStorage.getItem("privatekey"));
+		var publicKey = this.fromPem(localStorage.getItem("publickey"));
+		publicKey = await window.crypto.subtle.importKey("spki", publicKey, this.rsaAlg, true, []);
+		privateKey = await window.crypto.subtle.importKey("pkcs8", privateKey, this.rsaAlg, true, ["deriveKey"]);
+		return { privateKey, publicKey };
+	}
+
+	async importPublicKey(key) {
+		return window.crypto.subtle.importKey("spki", this.fromPem(key), this.rsaAlg, true, []);
+	}
 }
+
+// Example e2ee message
+/*
+var e2ee = new E2EE();
+var keys = await e2ee.importPemKeys();
+var public = await e2ee.importPublicKey(
+	`-----BEGIN PUBLIC KEY-----MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAESqj1RYbjJeiUEQYu2DIOC1UGPegxafOE9A4sz7nPbp6UwcIp6WHArLv5HIYgserVxEPAnI/VMtk2328IM6W1gfe/cv/DgwE7x8LtUcPvx3OsK3MjAVmiG8fudZYf8uUL-----END PUBLIC KEY-----`
+);
+var secret = await e2ee.deriveSecretKey({ privateKey: keys.privateKey, publicKey: public });
+var textCipher = await crypto.subtle.encrypt(e2ee.aesAlg, secret, new TextEncoder().encode("test"));
+var encrypted = await crypto.subtle.decrypt(e2ee.aesAlg, secret, textCipher);
+console.log("Encrypted: ", new TextDecoder().decode(encrypted));
+*/

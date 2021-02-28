@@ -1,4 +1,5 @@
 # gykivideo
+## Archived: continued at [fosscord](http://github.com/fosscord)
 
 ## Ideas:
 
